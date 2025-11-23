@@ -3,6 +3,12 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+.env
+src/main/resources/config.properties
+
+src/main/resources/files/
+src/main/resources/combined/
+
 ### IntelliJ IDEA ###
 .idea/
 *.iws
