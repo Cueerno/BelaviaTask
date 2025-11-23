@@ -32,7 +32,7 @@ public class Randomizer {
     }
 
     public static int getRandomEvenInt(int min, int max) {
-        return RANDOM.nextInt(min, (max + 1) / 2) * 2;
+        return RANDOM.nextInt((min + 1) / 2, (max + 1) / 2) * 2;
     }
 
     public static String getRandomDecimal(int min, int max, int scale) {
