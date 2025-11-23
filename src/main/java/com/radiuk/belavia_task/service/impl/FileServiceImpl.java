@@ -35,7 +35,12 @@ public class FileServiceImpl implements FileService {
 
             for (int filesCreatedCount = 1; filesCreatedCount <= filesCount; filesCreatedCount++) {
                 Path file = directory.resolve(filesNamePrefix + filesCreatedCount + ".txt");
-                Files.createFile(file);
+
+                try {
+                    Files.createFile(file);
+                } catch (IOException exception) {
+                    throw new FileProcessingException("Failed to create file: " + file, exception);
+                }
 
                 writeRandomDataToFile(file, linesPerFile);
 
@@ -44,7 +49,7 @@ public class FileServiceImpl implements FileService {
                 }
             }
         } catch (IOException exception) {
-            throw new FileProcessingException(exception.getMessage(), exception);
+            throw new FileProcessingException("Cannot create directory: " + directory, exception);
         }
     }
 
@@ -64,7 +69,7 @@ public class FileServiceImpl implements FileService {
             }
 
         } catch (IOException exception) {
-            throw new FileProcessingException(exception.getMessage(), exception);
+            throw new FileProcessingException("Error combining files in directory: " + initialDirectory, exception);
         }
 
         System.out.println("All files combined in " + combinedFile);
@@ -96,7 +101,7 @@ public class FileServiceImpl implements FileService {
 
             Files.move(temp, file, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
         } catch (IOException exception) {
-            throw new FileProcessingException(exception.getMessage(), exception);
+            throw new FileProcessingException("Error removing lines from file '" + file + "': " + exception.getMessage(), exception);
         }
 
         System.out.println("Removed " + removedCount);
@@ -110,7 +115,7 @@ public class FileServiceImpl implements FileService {
             Files.createFile(combinedFile);
             return combinedFile;
         } catch (IOException exception) {
-            throw new FileProcessingException(exception.getMessage(), exception);
+            throw new FileProcessingException("Cannot prepare combined file in: " + directoryWithCombinedFile, exception);
         }
     }
 
@@ -126,7 +131,7 @@ public class FileServiceImpl implements FileService {
                 writer.newLine();
             }
         } catch (IOException exception) {
-            throw new FileProcessingException(exception.getMessage(), exception);
+            throw new FileProcessingException("Error reading file: " + file, exception);
         }
 
         return removedCount;
