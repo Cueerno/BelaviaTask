@@ -15,8 +15,8 @@ POSTGRES_PASSWORD={your_database_password}
 ```
 
 ### 3. Set up Spring <br>
-Find the file application.properties.example and rename it to application.properties. And fill your data <br>
-*application.properties.example -> application.properties*
+Find the file config.properties.example and rename it to config.properties. And fill your data <br>
+*config.properties.example -> config.properties*
 
 ### 4. Set up Docker Compose
 ```docker
@@ -28,5 +28,9 @@ docker compose up --build
 ```
 
 ### 5. Execute sql scripts
+They are located along the path:
+```
+src/main/resources/db/
+```
 
 ### 6. Run Program
