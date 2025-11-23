@@ -1,0 +1,37 @@
+# Data Source
+datasource.url=jdbc:postgresql://localhost:5432/belavia_task_db
+datasource.username=
+datasource.password=
+
+# Randomizer
+# Range for generating a random date (years)
+random.date-years-back=5
+
+# # Length of random strings
+random.latin-length=10
+random.russian-length=10
+
+# Range for generating a random even number
+random.even-int-min=1
+random.even-int-max=100000000
+
+# Range for generating a random decimal
+random.decimal-min=1
+random.decimal-max=20
+random.decimal-scale=8
+
+# File generation settingsFile generation settings
+files.progress-interval=10
+files.count=100
+files.lines-per-file=100000
+files.initial-directory=src/main/resources/files
+files.directory-with-combined-file=src/main/resources/combined
+
+# Default names (prefix) for generated files
+files.generated-prefix=file
+
+# Name of combined file
+files.combined-name=combined.txt
+
+# Database import settings
+db.batch-size=10000
