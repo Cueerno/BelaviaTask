@@ -85,7 +85,7 @@ public class TextDataEtlCli {
     }
 
     private void combineFilesWithOptionalSubstringRemoval(Path initialDirectory, Path directoryWithCombinedFile) throws IOException {
-        String substringToRemove = readLine("Input substring to remove: ").trim();
+        String substringToRemove = readLine("Input substring to remove (empty line - don't remove anything): ").trim();
         fileService.combineFilesFromInitialDirectory(initialDirectory, directoryWithCombinedFile, substringToRemove);
     }
 
