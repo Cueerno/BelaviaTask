@@ -1,6 +1,7 @@
 package com.radiuk.belavia_task.service.impl;
 
 import com.radiuk.belavia_task.config.RandomValuesConfig;
+import com.radiuk.belavia_task.exception.FileCombiningException;
 import com.radiuk.belavia_task.exception.FileProcessingException;
 import com.radiuk.belavia_task.service.FileService;
 import lombok.Builder;
@@ -70,7 +71,7 @@ public class FileServiceImpl implements FileService {
             }
 
         } catch (IOException exception) {
-            throw new FileProcessingException("Error combining files in directory: " + initialDirectory, exception);
+            throw new FileCombiningException("Error combining files in directory: " + initialDirectory);
         }
 
         System.out.println("All files combined in " + combinedFile);
