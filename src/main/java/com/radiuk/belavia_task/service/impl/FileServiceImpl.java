@@ -1,7 +1,6 @@
 package com.radiuk.belavia_task.service.impl;
 
 import com.radiuk.belavia_task.config.RandomValuesConfig;
-import com.radiuk.belavia_task.exception.FileCombiningException;
 import com.radiuk.belavia_task.exception.FileProcessingException;
 import com.radiuk.belavia_task.service.FileService;
 import lombok.Builder;
@@ -28,10 +27,13 @@ public class FileServiceImpl implements FileService {
     private String combinedFileName;
 
     @Override
-    public void createFileWithRandomLines(Path directory) {
+    public void createFileWithRandomLines(Path directory) throws FileProcessingException {
         try {
             deleteDirectoryWithSubdirectoriesAndFiles(directory);
             Files.createDirectories(directory);
+        } catch (IOException exception) {
+            throw new FileProcessingException("Cannot create directory: " + directory, exception);
+        }
 
             System.out.println("Creating " + filesCount + " files...");
 
@@ -50,13 +52,10 @@ public class FileServiceImpl implements FileService {
                     System.out.println(filesCreatedCount + " files created");
                 }
             }
-        } catch (IOException exception) {
-            throw new FileProcessingException("Cannot create directory: " + directory, exception);
-        }
     }
 
     @Override
-    public void combineFilesFromInitialDirectory(Path initialDirectory, Path directoryWithCombinedFile, String substringToRemove) {
+    public void combineFilesFromInitialDirectory(Path initialDirectory, Path directoryWithCombinedFile, String substringToRemove) throws FileProcessingException {
         Path combinedFile = prepareCombinedFile(directoryWithCombinedFile);
         int removedCount = 0;
 
@@ -71,7 +70,7 @@ public class FileServiceImpl implements FileService {
             }
 
         } catch (IOException exception) {
-            throw new FileCombiningException("Error combining files in directory: " + initialDirectory);
+            throw new FileProcessingException("Error combining files in directory: " + initialDirectory);
         }
 
         System.out.println("All files combined in " + combinedFile);
@@ -79,7 +78,7 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public void removeLinesFromFileContaining(Path file, String substringToRemove) {
+    public void removeLinesFromFileContaining(Path file, String substringToRemove) throws FileProcessingException {
         System.out.println("Remove lines with substring: [" + substringToRemove + "] ...");
         long removedCount = 0;
 
@@ -109,7 +108,7 @@ public class FileServiceImpl implements FileService {
         System.out.println("Removed " + removedCount);
     }
 
-    private Path prepareCombinedFile(Path directoryWithCombinedFile) {
+    private Path prepareCombinedFile(Path directoryWithCombinedFile) throws FileProcessingException {
         try {
             deleteDirectoryWithSubdirectoriesAndFiles(directoryWithCombinedFile);
             Files.createDirectories(directoryWithCombinedFile);
@@ -121,7 +120,7 @@ public class FileServiceImpl implements FileService {
         }
     }
 
-    private int processSingleFile(Path file, String substringToRemove, int removedCount, BufferedWriter writer) throws IOException {
+    private int processSingleFile(Path file, String substringToRemove, int removedCount, BufferedWriter writer) throws IOException, FileProcessingException {
         try (BufferedReader reader = Files.newBufferedReader(file)) {
             String line;
             while ((line = reader.readLine()) != null) {
@@ -139,7 +138,7 @@ public class FileServiceImpl implements FileService {
         return removedCount;
     }
 
-    private void writeRandomDataToFile(Path file, int linesPerFile) {
+    private void writeRandomDataToFile(Path file, int linesPerFile) throws FileProcessingException {
         try (BufferedWriter writer = Files.newBufferedWriter(file, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)) {
             for (int i = 0; i < linesPerFile; i++) {
                 writer.write(getRandomDataForFile());

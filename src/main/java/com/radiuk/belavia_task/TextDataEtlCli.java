@@ -1,7 +1,9 @@
 package com.radiuk.belavia_task;
 
-import com.radiuk.belavia_task.exception.*;
-import com.radiuk.belavia_task.service.*;
+import com.radiuk.belavia_task.exception.DatabaseImportException;
+import com.radiuk.belavia_task.exception.FileProcessingException;
+import com.radiuk.belavia_task.service.DbImportService;
+import com.radiuk.belavia_task.service.FileService;
 import lombok.Builder;
 
 import java.io.IOException;
@@ -13,7 +15,7 @@ import java.util.Scanner;
 @Builder
 public class TextDataEtlCli {
 
-    private static final String CONFIRMING_CREATION_OF_NEW_FILES  = "Y";
+    private static final String CONFIRMING_CREATION_OF_NEW_FILES = "Y";
 
     private String initialDirectoryPath;
     private String directoryPathWithCombinedFile;
@@ -24,57 +26,49 @@ public class TextDataEtlCli {
 
     private final Scanner scanner = new Scanner(System.in);
 
-    public void runApp() throws IOException, FileProcessingException {
+    public void runApp() throws FileProcessingException {
         Path initialDirectory = Paths.get(initialDirectoryPath);
         Path directoryWithCombinedFile = Paths.get(directoryPathWithCombinedFile);
         Path combinedFile = directoryWithCombinedFile.resolve(combinedFileName);
 
-        askToGenerateFiles(initialDirectory);
+        try {
+            askToGenerateFiles(initialDirectory);
+        } catch (IOException exception) {
+            printException("File processing error: ", exception);
+        }
+
 
         while (true) {
-            try {
-                printMenu();
-                String choice = readLine("Make choice: ");
+            printMenu();
+            String choice = readLine("Make choice: ");
 
+            try {
                 switch (choice) {
-                    case "1" -> {
-                        try {
-                            combineFilesWithOptionalSubstringRemoval(initialDirectory, directoryWithCombinedFile);
-                        } catch (FileProcessingException exception) {
-                            System.err.println("Error combining files: " + exception.getMessage());
-                        }
-                    }
-                    case "2" -> {
-                        try {
-                            removeLinesContainingSubstringFromCombinedFile(combinedFile);
-                        } catch (FileCombiningException exception) {
-                            System.err.println("Error removing lines: " + exception.getMessage());
-                        }
-                    }
-                    case "3" -> {
-                        try {
-                            importCombinedFileToDatabase(combinedFile);
-                        } catch (DatabaseImportException exception) {
-                            System.err.println("Database import: " + exception.getMessage());
-                        }
-                    }
+                    case "1" -> combineFilesWithOptionalSubstringRemoval(initialDirectory, directoryWithCombinedFile);
+
+                    case "2" -> removeLinesContainingSubstringFromCombinedFile(combinedFile);
+                    case "3" -> importCombinedFileToDatabase(combinedFile);
                     case "4" -> {
                         System.out.println("Goodbye!");
                         return;
                     }
                     default -> System.out.println("Invalid choice. Try again.\n");
                 }
+            } catch (FileProcessingException exception) {
+                printException("File processing error: ", exception);
+            } catch (DatabaseImportException exception) {
+                printException("Database import error: ", exception);
             } catch (Exception exception) {
-                printException(exception);
+                printException("Unexpected exception: ", exception);
             }
         }
     }
 
-    private void askToGenerateFiles(Path initialDirectory) throws IOException {
+    private void askToGenerateFiles(Path initialDirectory) throws IOException, FileProcessingException {
         if (Files.exists(initialDirectory)) {
             String answer = readLine("Generate new files? (Previous files will be deleted) (y/n): ").trim().toLowerCase();
 
-            if (answer.equals("y")) {
+            if (answer.equalsIgnoreCase(CONFIRMING_CREATION_OF_NEW_FILES)) {
                 fileService.createFileWithRandomLines(initialDirectory);
                 System.out.println("Files generated.\n");
             }
@@ -84,17 +78,17 @@ public class TextDataEtlCli {
         }
     }
 
-    private void combineFilesWithOptionalSubstringRemoval(Path initialDirectory, Path directoryWithCombinedFile) throws IOException {
+    private void combineFilesWithOptionalSubstringRemoval(Path initialDirectory, Path directoryWithCombinedFile) throws IOException, FileProcessingException {
         String substringToRemove = readLine("Input substring to remove (empty line - don't remove anything): ").trim();
         fileService.combineFilesFromInitialDirectory(initialDirectory, directoryWithCombinedFile, substringToRemove);
     }
 
-    private void removeLinesContainingSubstringFromCombinedFile(Path combinedFile) throws IOException {
+    private void removeLinesContainingSubstringFromCombinedFile(Path combinedFile) throws IOException, FileProcessingException {
         String substringToRemove = readLine("Input substring to remove: ").trim();
         fileService.removeLinesFromFileContaining(combinedFile, substringToRemove);
     }
 
-    private void importCombinedFileToDatabase(Path combinedFile) throws IOException {
+    private void importCombinedFileToDatabase(Path combinedFile) throws IOException, DatabaseImportException {
         dbImportService.importCombinedFileToDb(combinedFile);
     }
 
@@ -116,9 +110,10 @@ public class TextDataEtlCli {
                 """);
     }
 
-    private void printException(Exception exception) {
+    private void printException(String message, Exception exception) {
         System.err.println("\n┌─ ERROR ──────────────────────────────┐");
-        System.err.println("│ " + exception);
+        System.err.println("│ " + message);
+        System.err.println("│ " + exception.getMessage());
         System.err.println("└──────────────────────────────────────┘\n");
     }
 }

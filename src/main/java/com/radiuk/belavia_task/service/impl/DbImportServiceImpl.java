@@ -36,25 +36,26 @@ public class DbImportServiceImpl implements DbImportService {
             VALUES (?, ?, ?, ?, ?)
             """;
 
-    public void importCombinedFileToDb(Path combinedFile) {
+    public void importCombinedFileToDb(Path combinedFile) throws DatabaseImportException {
         transactionTemplate.execute(status -> {
             try {
                 doImport(combinedFile);
-            } catch (NumberFormatException | IOException exception) {
+            } catch (DatabaseImportException | IOException exception) {
                 status.setRollbackOnly();
                 throw new DatabaseImportException("Failed to import file to database: " + combinedFile, exception);
+
             }
             return null;
         });
     }
 
-    private void doImport(Path combinedFile) throws IOException {
+    private void doImport(Path combinedFile) throws IOException, DatabaseImportException {
         long totalLines = FileUtil.getNumberOfLinesInFile(combinedFile);
         List<RandomRecord> batchArgs = readFileToBatch(combinedFile, batchSize);
         executeBatchInsertWithProgress(batchArgs, batchSize, totalLines);
     }
 
-    private List<RandomRecord> readFileToBatch(Path file, int batchSize) throws IOException {
+    private List<RandomRecord> readFileToBatch(Path file, int batchSize) throws IOException, DatabaseImportException {
         List<RandomRecord> batchArgs = new ArrayList<>(batchSize);
         try (BufferedReader reader = Files.newBufferedReader(file)) {
             String line;
@@ -100,7 +101,7 @@ public class DbImportServiceImpl implements DbImportService {
         System.out.println("The file import is complete. Total lines: " + totalImported);
     }
 
-    private RandomRecord parseDataFromLine(String[] parts) {
+    private RandomRecord parseDataFromLine(String[] parts) throws DatabaseImportException {
         try {
             return RandomRecord.builder()
                     .date(LocalDate.parse(parts[0], FORMATTER))
@@ -109,7 +110,7 @@ public class DbImportServiceImpl implements DbImportService {
                     .evenInt(Integer.parseInt(parts[3]))
                     .decimal(new BigDecimal(parts[4]))
                     .build();
-        } catch (NumberFormatException exception) {
+        } catch (Exception exception) {
             throw new DatabaseImportException("Failed to parse data: " + Arrays.toString(parts), exception);
         }
     }

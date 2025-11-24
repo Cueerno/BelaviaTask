@@ -1,6 +1,6 @@
 package com.radiuk.belavia_task.exception;
 
-public class FileProcessingException extends RuntimeException {
+public class FileProcessingException extends Exception {
     public FileProcessingException(String message) {
         super(message);
     }
