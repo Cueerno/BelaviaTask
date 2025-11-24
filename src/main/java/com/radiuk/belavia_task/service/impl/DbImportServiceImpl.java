@@ -1,4 +1,4 @@
- package com.radiuk.belavia_task.service.impl;
+package com.radiuk.belavia_task.service.impl;
 
 import com.radiuk.belavia_task.exception.DatabaseImportException;
 import com.radiuk.belavia_task.model.RandomRecord;
@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -31,7 +32,7 @@ public class DbImportServiceImpl implements DbImportService {
     private final TransactionTemplate transactionTemplate;
 
     private static final String INSERT_INTO_RANDOM_RECORDS_RANDOM_DATA = """
-            INSERT INTO public.random_records (date, latin, cyrillic, even_int, decimal_value)
+            INSERT INTO random_records ("date", latin, cyrillic, even_int, decimal_value)
             VALUES (?, ?, ?, ?, ?)
             """;
 
@@ -78,10 +79,11 @@ public class DbImportServiceImpl implements DbImportService {
                 public void setValues(PreparedStatement ps, int i) throws SQLException {
                     RandomRecord record = batch.get(i);
 
-                    ps.setString(1, record.getLatin());
-                    ps.setString(2, record.getCyrillic());
-                    ps.setInt(3, record.getEvenInt());
-                    ps.setBigDecimal(4, record.getDecimal());
+                    ps.setDate(1, Date.valueOf(record.getDate()));
+                    ps.setString(2, record.getLatin());
+                    ps.setString(3, record.getCyrillic());
+                    ps.setInt(4, record.getEvenInt());
+                    ps.setBigDecimal(5, record.getDecimal());
                 }
 
                 @Override
