@@ -13,10 +13,8 @@ import javax.sql.DataSource;
 
 public class TextDataEtlCliConfig {
 
-    private static final String CONFIG_FILE = "src/main/resources/config.properties";
-
     public static TextDataEtlCli buildTextDataEtlCli() {
-        PropertyConfig propertyConfig = new PropertyConfig(CONFIG_FILE);
+        PropertyConfig propertyConfig = new PropertyConfig("config.properties");
 
         DataSource dataSource = DataSourceConfig.createDataSource(
                 propertyConfig.getString("datasource.url"),

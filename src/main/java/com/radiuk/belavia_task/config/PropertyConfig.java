@@ -2,19 +2,19 @@ package com.radiuk.belavia_task.config;
 
 import com.radiuk.belavia_task.exception.ConfigurationException;
 
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 public class PropertyConfig {
 
     private final Properties properties = new Properties();
 
-    public PropertyConfig(String filePath) {
-        try (FileInputStream fis = new FileInputStream(filePath)) {
-            properties.load(fis);
+    public PropertyConfig(String fileName) {
+        try (InputStream is = getClass().getClassLoader().getResourceAsStream(fileName)) {
+            properties.load(is);
         } catch (IOException exception) {
-            throw new ConfigurationException("Failed to load properties from " + filePath, exception);
+            throw new ConfigurationException("Failed to load properties file: " + fileName, exception);
         }
     }
 
