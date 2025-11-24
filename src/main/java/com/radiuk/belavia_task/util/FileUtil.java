@@ -1,7 +1,5 @@
 package com.radiuk.belavia_task.util;
 
-import com.radiuk.belavia_task.exception.DirectoryDeleteException;
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -9,7 +7,9 @@ import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.stream.Stream;
 
-public class FileUtil {
+public final class FileUtil {
+
+    private FileUtil() {}
 
     public static long getNumberOfLinesInFile(Path file) throws IOException {
         try (Stream<String> s = Files.lines(file, StandardCharsets.UTF_8)) {
