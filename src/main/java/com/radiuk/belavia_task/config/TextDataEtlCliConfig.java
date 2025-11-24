@@ -32,6 +32,7 @@ public class TextDataEtlCliConfig {
                 .randomValuesConfig(new RandomValuesConfig(propertyConfig))
                 .combinedFileName(combinedFileName)
                 .filesCount(propertyConfig.getInt("files.count"))
+                .fieldSeparator(propertyConfig.getString("files.field-separator"))
                 .filesNamePrefix(propertyConfig.getString("files.generated-prefix"))
                 .linesPerFile(propertyConfig.getInt("files.lines-per-file"))
                 .progressInterval(propertyConfig.getInt("files.progress-interval"))

@@ -22,6 +22,7 @@ public class FileServiceImpl implements FileService {
     private int progressInterval;
     private int filesCount;
     private int linesPerFile;
+    private String fieldSeparator;
     private String filesNamePrefix;
     private String combinedFileName;
 
@@ -153,10 +154,10 @@ public class FileServiceImpl implements FileService {
     }
 
     private String getRandomDataForFile() {
-        return getRandomDate(randomValuesConfig.getDateYearsBack()).format(FORMATTER) + "||" +
-                getRandomString(LATIN_LETTERS, randomValuesConfig.getLatinLength()) + "||" +
-                getRandomString(CYRILLIC_LETTERS, randomValuesConfig.getRussianLength()) + "||" +
-                getRandomEvenInt(randomValuesConfig.getEvenIntMin(), randomValuesConfig.getEvenIntMax()) + "||" +
+        return getRandomDate(randomValuesConfig.getDateYearsBack()).format(FORMATTER) + fieldSeparator +
+                getRandomString(LATIN_LETTERS, randomValuesConfig.getLatinLength()) + fieldSeparator +
+                getRandomString(CYRILLIC_LETTERS, randomValuesConfig.getRussianLength()) + fieldSeparator +
+                getRandomEvenInt(randomValuesConfig.getEvenIntMin(), randomValuesConfig.getEvenIntMax()) + fieldSeparator +
                 getRandomDecimal(randomValuesConfig.getDecimalMin(), randomValuesConfig.getDecimalMax(), randomValuesConfig.getDecimalScale());
     }
 }
