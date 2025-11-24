@@ -1,5 +1,7 @@
 package com.radiuk.belavia_task.util;
 
+import com.radiuk.belavia_task.exception.DirectoryDeleteException;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;

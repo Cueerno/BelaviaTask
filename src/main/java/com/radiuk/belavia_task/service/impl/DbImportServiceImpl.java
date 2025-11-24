@@ -18,6 +18,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.radiuk.belavia_task.util.Randomizer.FORMATTER;
@@ -38,7 +39,7 @@ public class DbImportServiceImpl implements DbImportService {
         transactionTemplate.execute(status -> {
             try {
                 doImport(combinedFile);
-            } catch (IOException exception) {
+            } catch (NumberFormatException | IOException exception) {
                 status.setRollbackOnly();
                 throw new DatabaseImportException("Failed to import file to database: " + combinedFile, exception);
             }
@@ -98,12 +99,16 @@ public class DbImportServiceImpl implements DbImportService {
     }
 
     private RandomRecord parseDataFromLine(String[] parts) {
-        return RandomRecord.builder()
-                .date(LocalDate.parse(parts[0], FORMATTER))
-                .latin(parts[1])
-                .cyrillic(parts[2])
-                .evenInt(Integer.parseInt(parts[3]))
-                .decimal(new BigDecimal(parts[4]))
-                .build();
+        try {
+            return RandomRecord.builder()
+                    .date(LocalDate.parse(parts[0], FORMATTER))
+                    .latin(parts[1])
+                    .cyrillic(parts[2])
+                    .evenInt(Integer.parseInt(parts[3]))
+                    .decimal(new BigDecimal(parts[4]))
+                    .build();
+        } catch (NumberFormatException exception) {
+            throw new DatabaseImportException("Failed to parse data: " + Arrays.toString(parts), exception);
+        }
     }
 }
