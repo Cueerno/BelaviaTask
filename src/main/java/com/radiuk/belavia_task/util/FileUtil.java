@@ -1,5 +1,7 @@
 package com.radiuk.belavia_task.util;
 
+import com.radiuk.belavia_task.exception.DirectoryDeleteException;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -15,7 +17,7 @@ public class FileUtil {
         }
     }
 
-    public static void deleteDirectoryWithSubdirectoriesAndFiles(Path dir) throws IOException {
+    public static void deleteDirectoryWithSubdirectoriesAndFiles(Path dir) {
         if (Files.notExists(dir)) {
             return;
         }
@@ -27,9 +29,11 @@ public class FileUtil {
                         try {
                             Files.deleteIfExists(path);
                         } catch (IOException exception) {
-                            throw new RuntimeException("Failed to delete: " + path, exception);
+                            throw new DirectoryDeleteException("Failed to delete: " + path, exception);
                         }
                     });
+        } catch (IOException exception) {
+            throw new DirectoryDeleteException("Failed to walk: " + dir, exception);
         }
     }
 }
