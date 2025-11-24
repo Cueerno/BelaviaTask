@@ -1,8 +1,9 @@
 package com.radiuk.belavia_task.util;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 import java.util.Random;
 
 public class Randomizer {
@@ -35,10 +36,8 @@ public class Randomizer {
         return RANDOM.nextInt((min + 1) / 2, (max + 1) / 2) * 2;
     }
 
-    public static String getRandomDecimal(int min, int max, int scale) {
-        double d = min + RANDOM.nextDouble() * (max - min);
-
-        String format = "%." + scale + "f";
-        return String.format(Locale.ROOT, format , d);
+    public static BigDecimal getRandomDecimal(int min, int max, int scale) {
+        BigDecimal result = BigDecimal.valueOf(RANDOM.nextDouble() * (max - min) + min);
+        return result.setScale(scale, RoundingMode.HALF_UP);
     }
 }
