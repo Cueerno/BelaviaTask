@@ -13,6 +13,8 @@ import java.util.Scanner;
 @Builder
 public class TextDataEtlCli {
 
+    private static final String CONFIRMING_CREATION_OF_NEW_FILES  = "Y";
+
     private String initialDirectoryPath;
     private String directoryPathWithCombinedFile;
     private String combinedFileName;
@@ -22,7 +24,7 @@ public class TextDataEtlCli {
 
     private final Scanner scanner = new Scanner(System.in);
 
-    public void runApp() throws IOException {
+    public void runApp() throws IOException, FileProcessingException {
         Path initialDirectory = Paths.get(initialDirectoryPath);
         Path directoryWithCombinedFile = Paths.get(directoryPathWithCombinedFile);
         Path combinedFile = directoryWithCombinedFile.resolve(combinedFileName);
@@ -45,7 +47,7 @@ public class TextDataEtlCli {
                     case "2" -> {
                         try {
                             removeLinesContainingSubstringFromCombinedFile(combinedFile);
-                        } catch (FileProcessingException exception) {
+                        } catch (FileCombiningException exception) {
                             System.err.println("Error removing lines: " + exception.getMessage());
                         }
                     }
@@ -63,7 +65,7 @@ public class TextDataEtlCli {
                     default -> System.out.println("Invalid choice. Try again.\n");
                 }
             } catch (Exception exception) {
-                System.err.println("Unexpected error: " + exception);
+                printException(exception);
             }
         }
     }
@@ -112,5 +114,11 @@ public class TextDataEtlCli {
                 │ 4. Exit                       │
                 └───────────────────────────────┘
                 """);
+    }
+
+    private void printException(Exception exception) {
+        System.err.println("\n┌─ ERROR ──────────────────────────────┐");
+        System.err.println("│ " + exception);
+        System.err.println("└──────────────────────────────────────┘\n");
     }
 }
